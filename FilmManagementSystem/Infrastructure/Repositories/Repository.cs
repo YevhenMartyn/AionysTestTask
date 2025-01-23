@@ -1,4 +1,5 @@
 ﻿using Infrastructure.Data;
+using Infrastructure.Exceptions;
 using Infrastructure.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,7 +38,7 @@ namespace Infrastructure.Repositories
                 .FirstOrDefaultAsync();
             if (entity == null)
             {
-                throw new Exception($"Entity with {id} Id not found");
+                throw new NotFoundException($"Entity with {id} Id not found");
             }
 
             return entity;

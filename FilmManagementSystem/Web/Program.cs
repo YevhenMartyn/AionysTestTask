@@ -8,6 +8,7 @@ using Infrastructure.Repositories;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Web.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,11 +17,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+//middlewares
+builder.Services.AddScoped<GlobalExceptionHandler>();
 //repositories
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 //services
 builder.Services.AddScoped<IFilmService, FilmService>();
-
 //Mappers
 builder.Services.AddMapster();
 MapsterConfig.FilmMappings();
@@ -57,7 +59,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
+app.UseMiddleware<GlobalExceptionHandler>();
 app.MapControllers();
 
 app.Run();
