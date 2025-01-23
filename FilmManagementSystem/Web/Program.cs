@@ -7,6 +7,7 @@ using Infrastructure.Interfaces;
 using Infrastructure.Repositories;
 using Mapster;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 using Web.Middlewares;
 
@@ -29,7 +30,17 @@ MapsterConfig.FilmMappings();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "FilmManagementSystem API",
+        Version = "v1",
+        Description = "API for managing films"
+    });
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    options.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 builder.Services.AddValidatorsFromAssembly(Assembly.Load("ApplicationCore"));
 
@@ -53,7 +64,10 @@ app.UseCors("AllowReactApp");
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Film API v1");
+    });
 }
 
 app.UseHttpsRedirection();
